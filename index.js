@@ -19,7 +19,7 @@ const getForks = async (repo_url) => {
     let forks = res.data.map(fork => { 
       return {
         clone_url: fork.clone_url,
-        full_name: fork.full_name
+        ownerLogin: fork.owner.login,
        }
     })
 
@@ -33,10 +33,7 @@ const cloneRepos = async (repos) => {
   try {
     let clonePromises = []
     for(let repo of repos) {
-      // a repo with full name: user/repo will become user@repo for valid 
-      // directory naming purposes
-      const repoName = repo.full_name.replace(/\//, '@'); 
-      const localPath = path.resolve(__dirname, 'forks', repoName);
+      const localPath = path.resolve(__dirname, 'forks', repo.ownerLogin);
       clonePromises.push(git.Clone(repo.clone_url, localPath))
     }
     let clonedRepos = await Promise.all(clonePromises)
