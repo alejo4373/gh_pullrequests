@@ -47,8 +47,14 @@ const cloneRepos = async (repos) => {
 }
 
 const main = async () => {
+  const repo = process.argv[2];
+  if (!repo) {
+    console.error('No repo name specified')
+    return;
+  }
+  
   try {
-    let forks = await getForks('/repos/alejo4373/6_2_class_names/forks')
+    let forks = await getForks(`/repos/${repo}/forks`)
     console.log(forks.length)
     let clonedRepos = await cloneRepos(forks)
     console.log('clonedRepos =>', clonedRepos.length)
