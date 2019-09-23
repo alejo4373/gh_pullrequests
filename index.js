@@ -30,12 +30,12 @@ const getForks = async (repo_url) => {
   }
 }
 
-const cloneRepos = async (repos) => {
+const cloneRepos = async (repos, destPath) => {
   try {
     let clonePromises = []
     for(let repo of repos) {
-      const localPath = path.resolve(__dirname, 'forks', repo.ownerLogin);
-      clonePromises.push(git.Clone(repo.clone_url, localPath))
+      const repoLocalPath = path.resolve(destPath, repo.ownerLogin);
+      clonePromises.push(git.Clone(repo.clone_url, repoLocalPath))
     }
     let clonedRepos = await Promise.all(clonePromises)
     return clonedRepos;
@@ -61,15 +61,23 @@ const handleDestFolder = async (dest) => {
 
 const main = async () => {
   const repo = process.argv[2];
+  const dest = process.argv[3];
+
+  if (!dest) {
+    throw new Error('No destination folder specified');
+  }
+
+  const destPath = await handleDestFolder(dest);
+
   if (!repo) {
-    console.error('No repo name specified')
-    return;
+    throw new Error('No repo name specified')
   }
   
   try {
     let forks = await getForks(`/repos/${repo}/forks`)
     console.log(forks.length)
-    let clonedRepos = await cloneRepos(forks)
+
+    let clonedRepos = await cloneRepos(forks, destPath)
     console.log('clonedRepos =>', clonedRepos.length)
   } catch (err) {
     throw err;
