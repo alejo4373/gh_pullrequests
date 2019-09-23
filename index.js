@@ -1,5 +1,6 @@
 const axios = require('axios');
 const path = require('path');
+const fsPromises = require('fs').promises;
 const git = require('nodegit');
 const auth = require('./secrets');
 const API_URL = 'https://api.github.com';
@@ -40,6 +41,21 @@ const cloneRepos = async (repos) => {
     return clonedRepos;
   } catch (err) {
     console.error(err)
+  }
+}
+
+const handleDestFolder = async (dest) => {
+  const destPath = path.resolve(__dirname, dest);
+  try {
+    await fsPromises.mkdir(destPath, { recursive: true });
+    console.log("Created folder: " + destPath)
+    return destPath;
+  } catch(err) {
+    if (err.code === "EEXIST") {
+      return destPath
+    } else {
+      throw (err)
+    }
   }
 }
 
