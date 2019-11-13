@@ -1,7 +1,6 @@
-# GitHub Pull Requests Downloader
+# GitHub Repos Downloader
 
-JavaScript program to download all the pull requests from a given repo
-regardless of whether they are open or not.
+JavaScript program to download all forks for a specified github repo or all repos given in a file. 
 
 ## Setup
 
@@ -12,14 +11,26 @@ regardless of whether they are open or not.
   npm i
 ``` 
 
-3. Create a `forks` folder
+3. Invoke script.
+
+There are two CLI options for cloning repos
+* `--forks-from`. To download all forks from a specified repo.
 ```
-  mkdir forks
+node index.js --forks-from=joinpursuit/Pursuit-Core-Web-Express-Group-Project forks/express_group_project
 ```
 
-4. Invoke script with a repo name like so `"alejo4373/gh_pullrequests"`
-```
-  node index.js "username/a_repo"
-```
+* `--repos-file`. To download repos that are specified in a file. Repos must be in a new-line separated list like so:
+
+  `repos.txt`
+
+  ```
+  user1/repoA
+  user2/repoB
+  alejo4373/GameOn
+  ```
+
+  ```
+  node index.js --repos-file=./repos.txt ./clonedRepos   
+  ```
 
 
