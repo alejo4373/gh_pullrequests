@@ -4,6 +4,7 @@ const fsPromises = require('fs').promises;
 const git = require('nodegit');
 const auth = require('./secrets');
 const API_URL = 'https://api.github.com';
+const counts = require('./counts')
 
 const getForks = async (repo_url) => {
   try {
@@ -69,6 +70,7 @@ const handleReposFile = async (reposFile) => {
       if (repo)
         repos.push({
           ownerLogin: repo.split('/')[0],
+          simpleName: repo,
           clone_url: `https://github.com/${repo}.git`
         })
     }
@@ -93,21 +95,30 @@ const main = async () => {
   const destPath = await handleDestFolder(dest);
   const [option, optionValue] = repoArg.split('=')
   let clonedRepos;
+  let repos;
   try {
     switch (option) {
       case "--repos-file":
-        const repos = await handleReposFile(optionValue)
+        repos = await handleReposFile(optionValue)
         clonedRepos = await cloneRepos(repos, destPath)
         break;
       case "--forks-from":
         const forks = await getForks(`/repos/${optionValue}/forks`)
         clonedRepos = await cloneRepos(forks, destPath)
         break;
+      case "--commits-count":
+        repos = await handleReposFile(optionValue)
+        const reposCommitsCountMap = await counts.getCommitsCount(repos)
+        break;
+      case "--prs-count":
+        repos = await handleReposFile(optionValue)
+        await counts.getPRsCount(repos)
+        break;
       default:
         console.warn("!!! No valid option specified");
         break;
     }
-    console.log(`[MSG] ${clonedRepos.length} repos cloned to ${destPath}`)
+    // console.log(`[MSG] ${clonedRepos.length} repos cloned to ${destPath}`)
   } catch (err) {
     throw err;
   }
